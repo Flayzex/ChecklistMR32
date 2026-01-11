@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Вход — Расписание / Посещаемость</title>
+    <style>
+        :root {
+            --bg1: #0f172a;
+            --bg2: #0b1220;
+            --card: rgba(255, 255, 255, 0.04);
+            --accent: linear-gradient(135deg, #6ee7b7 0%, #3b82f6 100%);
+            --glass: rgba(255, 255, 255, 0.06);
+            --focus: 0 6px 18px rgba(59, 130, 246, 0.18);
+            --radius: 14px;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            background: radial-gradient(1200px 600px at 10% 20%, rgba(59, 130, 246, 0.06), transparent),
+                radial-gradient(900px 400px at 90% 80%, rgba(99, 102, 241, 0.04), transparent),
+                linear-gradient(180deg, var(--bg1), var(--bg2));
+            color: #e6eef8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+        }
+
+
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+            border-radius: var(--radius);
+            padding: 32px;
+            box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(8px) saturate(120%);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px
+        }
+
+        h1 {
+            font-size: 20px;
+            margin: 0 0 4px 0
+        }
+
+        p.lead {
+            margin: 0 0 20px 0;
+            color: #b8c7de;
+            font-size: 13px
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 14px
+        }
+
+        .btn {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: transform .13s ease, box-shadow .13s ease, opacity .13s;
+            background: linear-gradient(90deg, #0ea5e9 0%, #6366f1 100%);
+            color: white;
+            box-shadow: var(--focus);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(90deg, #06b6d4 0%, #34d399 100%)
+        }
+
+        .btn:active {
+            transform: translateY(1px)
+        }
+
+        @media(max-width:420px) {
+            .card {
+                padding: 20px
+            }
+
+            .btn-row {
+                flex-direction: column
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="card" role="main">
+        <div class="logo">
+            <svg viewBox="0 0 48 48" fill="none" aria-hidden>
+                <rect x="6" y="10" width="36" height="28" rx="3" fill="#0ea5e9" opacity="0.12">
+                </rect>
+                <path d="M14 8v4M34 8v4" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                <rect x="10" y="14" width="28" height="20" rx="2" stroke="#60a5fa"
+                    stroke-width="1.5">
+                </rect>
+                <path d="M16 20h16M16 26h10" stroke="#60a5fa" stroke-width="1.4"
+                    stroke-linecap="round">
+                </path>
+            </svg>
+            <div>
+                <h1>Добро пожаловать</h1>
+                <p class="lead">Выберите действие — расписание или отметка посещаемости</p>
+            </div>
+        </div>
+        <div class="btn-row">
+            <button class="btn" id="scheduleBtn">Расписание</button>
+            <button class="btn secondary" id="attendanceBtn">Посещаемость</button>
+        </div>
+    </main>
+
+    <script>
+        const Url = "https://tsue.edupage.org/timetable/view.php?num=90&class=*440";
+        document.getElementById('scheduleBtn').addEventListener('click', () => {
+            window.location.href = Url;
+        });
+        document.getElementById('attendanceBtn').addEventListener('click', () => {
+            window.location.href = 'attendance.html';
+        });
+    </script>
+</body>
+
+</html>

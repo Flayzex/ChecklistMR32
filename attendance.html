@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Система посещаемости</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+    <script>
+        /* ================= STUDENTS ================= */
+        const studentNames = [
+            "MENGBOYEV SHODIYORBEK",
+            "AXMEDOV JAVOXIR",
+            "MURODOV DILSHODBEK",
+            "ZOKIRJONOV AKBARJON",
+            "BARATOVA NASIBA",
+            "ABDURAHMONOV MUHIDILLO",
+            "TOSHPOʻLATOVA DIYORA",
+            "BEGIMKULOVA CHAROS",
+            "XUDOYBERGANOVA SHAHZODA",
+            "DJUNUSBAYEV ISLAM",
+            "SHODIYEV ANVAR",
+            "ERDONOV ASILBEK",
+            "BAXTIYAROVA LOBAR",
+            "MUHAMMADJONOV BAXROM",
+            "MAXMUDOVA SHAXINA",
+            "MAMMEDOV ABBOS",
+            "ESHTURDIEV ASILBEK"
+        ];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.innerHTML = `
+        <div class="container">
+          <header>
+            <h1>Система посещаемости</h1>
+            <div class="user-info">
+              <strong>Режим: Староста</strong>
+            </div>
+          </header>
+
+          <main>
+            <div class="date-section">
+              <label>Дата:</label>
+              <input type="date" id="date" value="${new Date().toISOString().split('T')[0]}">
+              <button id="sendBtn">Отправить в Telegram</button>
+            </div>
+
+            <div id="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Имя</th>
+                    <th>Был</th>
+                  </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+              </table>
+            </div>
+
+            <div id="result"></div>
+          </main>
+        </div>
+      `;
+
+            const tbody = document.getElementById("table-body");
+            studentNames.forEach((name, i) => {
+                tbody.innerHTML += `
+          <tr>
+            <td class="num">${i + 1}</td>
+            <td class="name">${name}</td>
+            <td class="checkbox">
+              <input type="checkbox" class="studentCheck">
+            </td>
+          </tr>
+        `;
+            });
+
+            document.getElementById("sendBtn").addEventListener("click", sendToTelegram);
+        });
+
+        async function sendToTelegram() {
+            const date = document.getElementById("date").value;
+            const checks = document.querySelectorAll(".studentCheck");
+
+            const temp = document.createElement("div");
+            temp.style.background = "white";
+            temp.style.padding = "20px";
+            temp.innerHTML = `<h2>Дата: ${date}</h2>`;
+
+            const table = document.createElement("table");
+            table.style.borderCollapse = "collapse";
+            table.style.width = "100%";
+            table.innerHTML = "<tr><th>#</th><th>Имя</th><th>Был</th></tr>";
+
+            studentNames.forEach((name, i) => {
+                table.innerHTML += `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${name}</td>
+            <td style="
+              text-align:center;
+              font-size:22px;
+              font-weight:bold;
+              color:${checks[i].checked ? '#27ae60' : '#e74c3c'};
+            ">
+              ${checks[i].checked ? '✓' : '✗'}
+            </td>
+          </tr>
+        `;
+            });
+
+            temp.appendChild(table);
+            document.body.appendChild(temp);
+
+            const canvas = await html2canvas(temp, { scale: 2 });
+            const base64 = canvas.toDataURL("image/png");
+
+            temp.remove();
+
+            await fetch("/api/sendAttendance", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    imageBase64: base64,
+                    caption: `Посещаемость за ${date}`
+                })
+            });
+
+            showResult("✅ Отправлено в Telegram", "success");
+        }
+
+        function showResult(text, type) {
+            const el = document.getElementById("result");
+            el.textContent = text;
+            el.className = type;
+            setTimeout(() => el.textContent = "", 5000);
+        }
+    </script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .date-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        #sendBtn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #table-container {
+            max-height: 70vh;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px 8px;
+        }
+
+        th {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+        }
+
+        td.num {
+            width: 50px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        td.checkbox {
+            text-align: center;
+            width: 100px;
+        }
+
+        #result.success {
+            background: #d4edda;
+            color: #155724;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body></body>
+
+</html>
